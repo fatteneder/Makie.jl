@@ -191,6 +191,7 @@ function initialize_block!(tbox::Textbox)
 
 
     function submit()
+        cursorindex[] = 0
         if displayed_is_valid[]
             tbox.stored_string[] = tbox.displayed_string[]
         end
