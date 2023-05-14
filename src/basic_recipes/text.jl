@@ -6,7 +6,7 @@ function plot!(plot::Text)
     linewidths = Observable(Float32[])
     linecolors = Observable(RGBAf[])
     lineindices = Ref(Int[])
-    
+
     onany(plot.text, plot.fontsize, plot.font, plot.fonts, plot.align,
             plot.rotation, plot.justification, plot.lineheight, plot.color, 
             plot.strokecolor, plot.strokewidth, plot.word_wrap_width, plot.offset) do str,
@@ -55,9 +55,12 @@ function plot!(plot::Text)
 
     sc = parent_scene(plot)
 
-    onany(linesegs, positions, sc.camera.projectionview, sc.px_area, 
+    onany(linesegs, positions, sc.camera.projectionview, sc.px_area,
             transform_func_obs(sc), get(plot, :space, :data)) do segs, pos, _, _, transf, space
-        pos_transf = scene_to_screen(apply_transform(transf, pos, space), sc)
+        pos_transf = apply_transform(transf, pos, space)
+        if space !== :relative
+            pos_transf = scene_to_screen(pos_transf, sc)
+        end
         linesegs_shifted[] = map(segs, lineindices[]) do seg, index
             seg + attr_broadcast_getindex(pos_transf, index)
         end
